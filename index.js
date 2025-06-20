@@ -19,7 +19,6 @@ const  transporter = nodemailer.createTransport({
     }
 });
 
-// console.log(randomOTP());
 app.post('/sentotp', async (req, res) => {
     const { email } = req.body;
     if (!email) {
