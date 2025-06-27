@@ -1,10 +1,16 @@
+// OTP Verification System API
+// Integration-friendly, standardized responses for easy use in any project
 import { configDotenv } from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
 import nodemailer from 'nodemailer';
+import cors from 'cors';
 const app = express();
 configDotenv();
 app.use(bodyParser.json());
+// For production, set origin: 'https://yourdomain.com' in cors options
+// app.use(cors({ origin: 'https://yourdomain.com' }));
+app.use(cors());
 
 const otpStore = new Map()
 const randomOTP = ()=>{
@@ -19,6 +25,12 @@ const  transporter = nodemailer.createTransport({
     }
 });
 
+/**
+ * @route POST /sentotp
+ * @desc Send OTP to email
+ * @body { email: string }
+ * @returns { success, message, data: { email } }
+ */
 app.post('/sentotp', async (req, res) => {
     const { email } = req.body;
     if (!email) {
@@ -49,14 +61,23 @@ app.post('/sentotp', async (req, res) => {
     try {
         await transporter.sendMail(mailOptions);
         console.log(`OTP sent to ${email}`);
-        return res.status(200).json({ success: true, message: "OTP sent successfully!" });
+        return res.status(200).json({
+            success: true,
+            message: "OTP sent successfully!",
+            data: { email }
+        });
     } catch (error) {
         console.error("Error sending OTP:", error);
         return res.status(500).json({ success: false, message: "Failed to send OTP. Please try again later." });
     }
 });
 
-
+/**
+ * @route POST /verifyotp
+ * @desc Verify OTP for email
+ * @body { email: string, otp: string }
+ * @returns { success, message, data: { email } }
+ */
 app.post('/verifyotp', (req, res) => {
     const { email, otp } = req.body;
     if (!email || !otp) {
@@ -76,14 +97,17 @@ app.post('/verifyotp', (req, res) => {
     }
     if (storedOtp === otp) {
         otpStore.delete(email);
-        return res.status(200).json({ success: true, message: "OTP verified successfully!" });
+        return res.status(200).json({
+            success: true,
+            message: "OTP verified successfully!",
+            data: { email }
+        });
     } else {
         return res.status(400).json({ success: false, message: "Invalid OTP. Please try again." });
     }
 });
 
-
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
