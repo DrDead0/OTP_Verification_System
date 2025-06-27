@@ -1,8 +1,8 @@
 // import React from 'react';
 
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
-import SendOtp from './pages/sendOtp';
-import VerifyOtp from './pages/verifyOtp';
+import SendOtp from './components/SendOtp';
+import VerifyOtp from './components/VerifyOtp';
 
 const App = () => {
   return (
