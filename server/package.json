@@ -52,8 +52,7 @@
   "bugs": {
     "url": "https://github.com/zeroaxiis/OTP_Verification_System/issues"
   },
-  "homepage": "https://github.com/zeroaxiis/OTP_Verification_System#readme"
-}
+  "homepage": "https://github.com/zeroaxiis/OTP_Verification_System#readme",
   "publishConfig": {
     "access": "public"
   }
