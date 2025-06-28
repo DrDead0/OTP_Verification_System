@@ -1,113 +1,67 @@
-// OTP Verification System API
-// Integration-friendly, standardized responses for easy use in any project
 import { configDotenv } from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
-import nodemailer from 'nodemailer';
 import cors from 'cors';
+import { createOtpRoutes, rateLimitMiddleware } from './middleware/otp-middleware.js';
+
 const app = express();
 configDotenv();
+
 app.use(bodyParser.json());
-// For production, set origin: 'https://yourdomain.com' in cors options
-// app.use(cors({ origin: 'https://yourdomain.com' }));
 app.use(cors());
 
-const otpStore = new Map()
-const randomOTP = ()=>{
-    return Math.floor(100000 + Math.random() * 900000).toString();
-}
+app.use('/sentotp', rateLimitMiddleware({ maxAttempts: 5, windowMs: 15 * 60 * 1000 }));
+app.use('/verifyotp', rateLimitMiddleware({ maxAttempts: 10, windowMs: 15 * 60 * 1000 }));
 
-const  transporter = nodemailer.createTransport({
+const otpRoutes = createOtpRoutes({
+  emailConfig: {
     service: 'gmail',
-    auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASSWORD
-    }
+    user: process.env.EMAIL,
+    pass: process.env.PASSWORD
+  },
+  otpLength: 6,
+  expiryMinutes: 5,
+  enableCleanupRoute: process.env.NODE_ENV === 'development'
 });
 
-/**
- * @route POST /sentotp
- * @desc Send OTP to email
- * @body { email: string }
- * @returns { success, message, data: { email } }
- */
-app.post('/sentotp', async (req, res) => {
-    const { email } = req.body;
-    if (!email) {
-        return res.status(400).json({ success: false, message: "Email is required!" });
-    }
-    const otp = randomOTP();
-    const expireAt = Date.now() + 5 * 60 * 1000; // 5 minutes from now
-    otpStore.set(email, { otp, expireAt });
-    const mailOptions = {
-        from: process.env.EMAIL,
-        to: email,
-        subject: 'Your OTP Code',
-        html: `
-            <div style="font-family: Arial, sans-serif; color: #333;">
-                <h2>Hello,</h2>
-                <p>Your One-Time Password (OTP) is:</p>
-                <div style="font-size: 2em; font-weight: bold; color: #2d8cf0; margin: 16px 0;">
-                    ${otp}
-                </div>
-                <p>This OTP is valid for <strong>5 minutes</strong>.</p>
-                <p style="color: #b00;">Do not share this code with anyone.</p>
-                <hr>
-                <small>If you did not request this code, please ignore this email.</small>
-            </div>
-        `,
-        text: `Hello,\n\nYour One-Time Password (OTP) is: ${otp}\n\nOTP is valid for 5 minutes.\n\nDon't share this code with anyone.\n\nIf you did not request this code, please ignore this email.`
-    };
-    try {
-        await transporter.sendMail(mailOptions);
-        console.log(`OTP sent to ${email}`);
-        return res.status(200).json({
-            success: true,
-            message: "OTP sent successfully!",
-            data: { email }
-        });
-    } catch (error) {
-        console.error("Error sending OTP:", error);
-        return res.status(500).json({ success: false, message: "Failed to send OTP. Please try again later." });
-    }
+app.use('/', otpRoutes);
+
+app.post('/sentotp', (req, res, next) => {
+  req.url = '/send';
+  next();
 });
 
-/**
- * @route POST /verifyotp
- * @desc Verify OTP for email
- * @body { email: string, otp: string }
- * @returns { success, message, data: { email } }
- */
-app.post('/verifyotp', (req, res) => {
-    const { email, otp } = req.body;
-    if (!email || !otp) {
-        return res.status(400).json({ success: false, message: "Email and OTP are required!" });
-    }
-    if (!/^\d{6}$/.test(otp)) {
-        return res.status(400).json({ success: false, message: "Invalid OTP format. OTP must be 6 digits." });
-    }
-    const storeData = otpStore.get(email);
-    if (!storeData) {
-        return res.status(400).json({ success: false, message: "OTP not found for this email. Please request a new OTP." });
-    }
-    const { otp: storedOtp, expireAt } = storeData;
-    if (Date.now() > expireAt) {
-        otpStore.delete(email);
-        return res.status(400).json({ success: false, message: "OTP has expired. Please request a new OTP." });
-    }
-    if (storedOtp === otp) {
-        otpStore.delete(email);
-        return res.status(200).json({
-            success: true,
-            message: "OTP verified successfully!",
-            data: { email }
-        });
-    } else {
-        return res.status(400).json({ success: false, message: "Invalid OTP. Please try again." });
-    }
+app.post('/verifyotp', (req, res, next) => {
+  req.url = '/verify';
+  next();
 });
 
-const port = process.env.PORT;
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    version: '1.0.0'
+  });
+});
+
+app.use((error, req, res, next) => {
+  console.error('Server error:', error);
+  res.status(500).json({
+    success: false,
+    message: 'Internal server error'
+  });
+});
+
+app.use('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Endpoint not found'
+  });
+});
+
+const port = process.env.PORT || 3300;
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`🚀 OTP Verification Server running on http://localhost:${port}`);
+  console.log(`📧 Email service: ${process.env.EMAIL ? 'Configured' : 'Not configured'}`);
+  console.log(`🔒 CORS: ${process.env.NODE_ENV === 'production' ? 'Restricted' : 'Open'}`);
 });

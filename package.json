@@ -1,0 +1,50 @@
+{
+  "name": "otp-verification-system",
+  "version": "1.0.0",  "description": "Complete OTP verification system with React components and Express.js middleware - designed for easy integration",
+  "private": true,
+  "type": "module","workspaces": [
+    "client",
+    "server"
+  ],  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "publish:client": "cd client && npm publish",
+    "publish:server": "cd server && npm publish"
+  },
+  "keywords": [
+    "otp",
+    "verification",
+    "authentication",
+    "react",
+    "express",
+    "email",
+    "2fa",
+    "security",
+    "integration",
+    "middleware",
+    "components"
+  ],
+  "author": {
+    "name": "Ashish Chaurasiya",
+    "email": "ashishchaurasiya128@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourorg/otp-verification-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourorg/otp-verification-system/issues"
+  },
+  "homepage": "https://github.com/yourorg/otp-verification-system#readme",
+  "files": [
+    "types.d.ts",
+    "LICENSE",
+    "CHANGELOG.md",
+    "SECURITY.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

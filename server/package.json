@@ -1,22 +1,59 @@
 {
-  "name": "OTP_Verification_System",
+  "name": "@zeroaxiis/otp-verification-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Express.js middleware and utilities for OTP verification system",
   "main": "index.js",
   "type": "module",
+  "files": [
+    "index.js",
+    "middleware/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "otp",
+    "verification",
+    "express",
+    "middleware",
+    "email",
+    "authentication",
+    "nodejs"
+  ],
   "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "prepublishOnly": "echo 'Ready for publish'"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": {
+    "name": "Ashish Chaurasiya",
+    "email": "ashishchaurasiya128@gmail.com"
+  },
+  "license": "MIT",
   "packageManager": "pnpm@10.12.1",
   "dependencies": {
-    "body-parser": "^2.2.0",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "nodemailer": "^7.0.3"
+    "express": "^4.19.2",
+    "nodemailer": "^6.9.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zeroaxiis/OTP_Verification_System.git",
+    "directory": "server"
+  },
+  "bugs": {
+    "url": "https://github.com/zeroaxiis/OTP_Verification_System/issues"
+  },
+  "homepage": "https://github.com/zeroaxiis/OTP_Verification_System#readme",
+  "publishConfig": {
+    "access": "public"
   }
 }
