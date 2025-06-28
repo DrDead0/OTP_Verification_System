@@ -1,71 +1,47 @@
-/**
- * @fileoverview Enhanced VerifyOtp Component
- * Integration-friendly component with extensive customization options
- */
-
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { validateOTP, formatTimeRemaining } from '../../../lib/utils.js';
 import { DEFAULT_CONFIG, ERROR_MESSAGES } from '../../../lib/types.js';
 
 const VerifyOtp = ({
-  // Required props
   email,
   
-  // API Configuration
   apiUrl = DEFAULT_CONFIG.apiBaseUrl + DEFAULT_CONFIG.endpoints.verify,
-  resendApiUrl,
-  httpMethod = "POST",
+  resendApiUrl,  httpMethod = "POST",
   
-  // Callbacks
   onSuccess = () => {},
   onError = () => {},
   onChange = () => {},
-  onResend = () => {},
-  onExpiry = () => {},
+  onResend = () => {},  onExpiry = () => {},
   
-  // UI Customization
   label = "OTP",
   placeholder = "Enter the OTP you received",
   buttonText = "Verify OTP",
   loadingText = "Verifying...",
-  resendText = "Resend OTP",
-  resendingText = "Resending...",
+  resendText = "Resend OTP",  resendingText = "Resending...",
   
-  // Styling
   className = "",
   inputClassName = "",
   buttonClassName = "",
-  errorClassName = "",
-  successClassName = "",
+  errorClassName = "",  successClassName = "",
   
-  // Behavior
   disabled = false,
   autoFocus = true,
   clearOnSuccess = true,
   showResend = true,
-  resendCooldown = 30,
-  maxLength = 6,
+  resendCooldown = 30,  maxLength = 6,
   
-  // Timer
   showTimer = true,
-  timerDuration = 5 * 60 * 1000, // 5 minutes
-  
-  // Theme
+  timerDuration = 5 * 60 * 1000,  
   theme = {},
   
-  // Advanced
   customValidation = null,
-  autoSubmit = false,
-  formatInput = true,
+  autoSubmit = false,  formatInput = true,
   
-  // Integration helpers
   value: controlledValue,
   defaultValue = "",
-  name = "otp",
-  id = "otp-verify-input",
+  name = "otp",  id = "otp-verify-input",
   
-  // Accessibility
   ariaLabel = "Enter verification code"
 }) => {
   const [otp, setOtp] = useState(controlledValue || defaultValue);
@@ -78,14 +54,10 @@ const VerifyOtp = ({
   const [resendCooldownTime, setResendCooldownTime] = useState(0);
   
   const inputRef = useRef(null);
-  const timerRef = useRef(null);
-  const resendTimerRef = useRef(null);
+  const timerRef = useRef(null);  const resendTimerRef = useRef(null);
   
-  // Controlled vs uncontrolled component handling
-  const isControlled = controlledValue !== undefined;
-  const otpValue = isControlled ? controlledValue : otp;
+  const isControlled = controlledValue !== undefined;  const otpValue = isControlled ? controlledValue : otp;
   
-  // Default theme
   const defaultTheme = {
     primaryColor: "#3B82F6",
     successColor: "#10B981",
@@ -94,10 +66,8 @@ const VerifyOtp = ({
     spacing: "1rem",
     fontSize: "1rem"
   };
+    const finalTheme = { ...defaultTheme, ...theme };
   
-  const finalTheme = { ...defaultTheme, ...theme };
-  
-  // Timer effect
   useEffect(() => {
     if (showTimer && timeRemaining > 0) {
       timerRef.current = setInterval(() => {
@@ -115,10 +85,8 @@ const VerifyOtp = ({
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
-    };
-  }, [timeRemaining, showTimer, onExpiry]);
+    };  }, [timeRemaining, showTimer, onExpiry]);
   
-  // Resend cooldown effect
   useEffect(() => {
     if (resendCooldownTime > 0) {
       resendTimerRef.current = setTimeout(() => {
@@ -138,14 +106,12 @@ const VerifyOtp = ({
       }
     };
   }, [resendCooldownTime]);
-  
-  // Auto focus effect
+    
   useEffect(() => {
     if (autoFocus && inputRef.current) {
       inputRef.current.focus();
     }
   }, [autoFocus]);
-    // Auto submit effect
   useEffect(() => {
     if (autoSubmit && otpValue.length === maxLength) {
       const submitForm = async () => {
@@ -197,39 +163,31 @@ const VerifyOtp = ({
       submitForm();
     }
   }, [otpValue, autoSubmit, maxLength, customValidation, email, httpMethod, apiUrl, clearOnSuccess, isControlled, onSuccess, onError]);
-  
-  const handleInputChange = (e) => {
+    const handleInputChange = (e) => {
     let value = e.target.value;
     
-    // Format input (numbers only)
     if (formatInput) {
       value = value.replace(/\D/g, '');
     }
     
-    // Limit length
     if (value.length > maxLength) {
       value = value.slice(0, maxLength);
     }
     
     if (!isControlled) {
-      setOtp(value);
-    }
+      setOtp(value);    }
     
-    // Clear previous messages
     if (error) setError("");
     if (success) setSuccess("");
     
     onChange(value);
   };
-  
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     if (e) e.preventDefault();
     
-    // Clear previous messages
     setError("");
     setSuccess("");
     
-    // Validate OTP
     const otpCode = otpValue.trim();
     const validation = customValidation 
       ? customValidation(otpCode)
@@ -286,9 +244,8 @@ const VerifyOtp = ({
       const url = resendApiUrl || apiUrl.replace('/verify', '/send');
       const response = await axios.post(url, { email });
       
-      if (response.data.success) {
-        setSuccess("OTP resent successfully!");
-        setTimeRemaining(timerDuration); // Reset timer
+      if (response.data.success) {        setSuccess("OTP resent successfully!");
+        setTimeRemaining(timerDuration);
         onResend(response.data);
       } else {
         throw new Error(response.data.message || "Failed to resend OTP");
@@ -302,17 +259,13 @@ const VerifyOtp = ({
       setResendCooldownTime(0);
     } finally {
       setResending(false);
-    }
-  };
+    }  };
   
-  // Generate CSS classes
   const containerClasses = `otp-verify-container ${className}`;
   const inputClasses = `otp-input ${inputClassName} ${error ? 'error' : ''} ${success ? 'success' : ''}`;
   const buttonClasses = `otp-button ${buttonClassName} ${loading || disabled ? 'disabled' : ''}`;
-  const errorClasses = `otp-error ${errorClassName}`;
-  const successClasses = `otp-success ${successClassName}`;
+  const errorClasses = `otp-error ${errorClassName}`;  const successClasses = `otp-success ${successClassName}`;
   
-  // Inline styles for theme support
   const inputStyle = {
     borderColor: error ? finalTheme.errorColor : 
                 success ? finalTheme.successColor : 
@@ -330,17 +283,13 @@ const VerifyOtp = ({
     fontSize: finalTheme.fontSize,
     padding: finalTheme.spacing
   };
-  
-  return (
+    return (
     <div className={containerClasses}>
-      {/* Email Display */}
       {email && (
         <p className="mb-2 text-gray-600 text-center">
           Verifying for: <strong>{email}</strong>
-        </p>
-      )}
+        </p>      )}
       
-      {/* Timer */}
       {showTimer && (
         <div className="mb-4 text-center">
           <p className="text-sm text-gray-600">
@@ -378,17 +327,13 @@ const VerifyOtp = ({
           maxLength={maxLength}
           autoComplete="one-time-code"
           aria-label={ariaLabel}
-          required
-        />
+          required        />
         
-        {/* Error Message */}
         {error && (
           <div className={errorClasses} style={{ color: finalTheme.errorColor }}>
             {error}
-          </div>
-        )}
+          </div>        )}
         
-        {/* Success Message */}
         {success && (
           <div className={successClasses} style={{ color: finalTheme.successColor }}>
             {success}
@@ -401,10 +346,8 @@ const VerifyOtp = ({
           style={buttonStyle}
           disabled={loading || disabled}
         >
-          {loading ? loadingText : buttonText}
-        </button>
+          {loading ? loadingText : buttonText}        </button>
         
-        {/* Resend Button */}
         {showResend && (
           <div className="text-center">
             {canResend && resendCooldownTime === 0 ? (
@@ -428,7 +371,6 @@ const VerifyOtp = ({
   );
 };
 
-// Default CSS classes (can be overridden)
 VerifyOtp.defaultProps = {
   className: "otp-verify-form",
   inputClassName: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",

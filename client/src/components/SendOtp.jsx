@@ -1,50 +1,30 @@
-/**
- * @fileoverview Enhanced SendOtp Component
- * Integration-friendly component with extensive customization options
- */
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { validateEmail } from "../../../lib/utils.js";
 import { DEFAULT_CONFIG, ERROR_MESSAGES } from "../../../lib/types.js";
 
 const SendOtp = ({
-  // API Configuration
-  apiUrl = DEFAULT_CONFIG.apiBaseUrl + DEFAULT_CONFIG.endpoints.send,
-  httpMethod = "POST",
+  apiUrl = DEFAULT_CONFIG.apiBaseUrl + DEFAULT_CONFIG.endpoints.send,  httpMethod = "POST",
   
-  // Callbacks
   onSuccess = () => {},
-  onError = () => {},
-  onChange = () => {},
+  onError = () => {},  onChange = () => {},
   
-  // UI Customization
   label = "Email",
   placeholder = "Enter your email address",
-  buttonText = "Send OTP",
-  loadingText = "Sending...",
+  buttonText = "Send OTP",  loadingText = "Sending...",
   
-  // Styling
   className = "",
   inputClassName = "",
   buttonClassName = "",
-  errorClassName = "",
-  successClassName = "",
+  errorClassName = "",  successClassName = "",
   
-  // Behavior
   disabled = false,
   autoFocus = false,
-  clearOnSuccess = true,
-  validateOnBlur = true,
+  clearOnSuccess = true,  validateOnBlur = true,
   
-  // Theme
-  theme = {},
+  theme = {},  
+  customValidation = null,  retryConfig = { enabled: false, maxRetries: 3, delay: 1000 },
   
-  // Advanced
-  customValidation = null,
-  retryConfig = { enabled: false, maxRetries: 3, delay: 1000 },
-  
-  // Integration helpers
   value: controlledValue,
   defaultValue = "",
   name = "email",
@@ -53,14 +33,10 @@ const SendOtp = ({
   const [input, setInput] = useState(controlledValue || defaultValue);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [retryCount, setRetryCount] = useState(0);
+  const [success, setSuccess] = useState("");  const [retryCount, setRetryCount] = useState(0);
   
-  // Controlled vs uncontrolled component handling
-  const isControlled = controlledValue !== undefined;
-  const inputValue = isControlled ? controlledValue : input;
+  const isControlled = controlledValue !== undefined;  const inputValue = isControlled ? controlledValue : input;
   
-  // Default theme
   const defaultTheme = {
     primaryColor: "#3B82F6",
     successColor: "#10B981",
@@ -77,12 +53,10 @@ const SendOtp = ({
   }, [inputValue, onChange]);
   
   const handleInputChange = (e) => {
-    const value = e.target.value;
-    if (!isControlled) {
+    const value = e.target.value;    if (!isControlled) {
       setInput(value);
     }
     
-    // Clear previous messages
     if (error) setError("");
     if (success) setSuccess("");
     
@@ -120,12 +94,10 @@ const SendOtp = ({
       } else {
         throw new Error(response.data.message || "Failed to send OTP");
       }
-    } catch (err) {
-      const errorMessage = err?.response?.data?.message || 
+    } catch (err) {      const errorMessage = err?.response?.data?.message || 
                           err?.message || 
                           ERROR_MESSAGES.SEND_FAILED;
       
-      // Retry logic
       if (retryConfig.enabled && attempt < retryConfig.maxRetries) {
         setTimeout(() => {
           performSubmit(email, attempt + 1);
@@ -139,15 +111,12 @@ const SendOtp = ({
       setRetryCount(0);
     }
   };
-  
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Clear previous messages
     setError("");
     setSuccess("");
     
-    // Validate input
     const email = inputValue.trim();
     const validation = customValidation 
       ? customValidation(email)
@@ -162,15 +131,12 @@ const SendOtp = ({
     await performSubmit(email);
     setLoading(false);
   };
-  
-  // Generate CSS classes
+    
   const containerClasses = `otp-send-container ${className}`;
   const inputClasses = `otp-input ${inputClassName} ${error ? 'error' : ''} ${success ? 'success' : ''}`;
   const buttonClasses = `otp-button ${buttonClassName} ${loading || disabled ? 'disabled' : ''}`;
-  const errorClasses = `otp-error ${errorClassName}`;
-  const successClasses = `otp-success ${successClassName}`;
+  const errorClasses = `otp-error ${errorClassName}`;  const successClasses = `otp-success ${successClassName}`;
   
-  // Inline styles for theme support
   const inputStyle = {
     borderColor: error ? finalTheme.errorColor : 
                 success ? finalTheme.successColor : 
@@ -212,24 +178,20 @@ const SendOtp = ({
           disabled={loading || disabled}
           autoFocus={autoFocus}
           autoComplete="email"
-          required
-        />
+          required        />
         
-        {/* Error Message */}
         {error && (
           <div className={errorClasses} style={{ color: finalTheme.errorColor }}>
             {error}
           </div>
         )}
         
-        {/* Success Message */}
         {success && (
           <div className={successClasses} style={{ color: finalTheme.successColor }}>
             {success}
           </div>
         )}
         
-        {/* Retry Information */}
         {retryConfig.enabled && retryCount > 0 && (
           <div className="text-sm text-gray-600">
             Retrying... (Attempt {retryCount + 1} of {retryConfig.maxRetries})
@@ -249,7 +211,6 @@ const SendOtp = ({
   );
 };
 
-// Default CSS classes (can be overridden)
 SendOtp.defaultProps = {
   className: "otp-send-form",
   inputClassName: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",

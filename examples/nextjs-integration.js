@@ -1,25 +1,15 @@
-/**
- * @fileoverview Next.js Integration Example
- * Shows how to integrate OTP verification system with Next.js
- */
-
-// pages/auth/send-otp.js
 import { useState } from 'react';
 import { SendOtp } from '../../../client/src/components/SendOtp';
 
 export default function SendOtpPage() {
   const [otpSent, setOtpSent] = useState(false);
   
-  const handleOtpSuccess = (data) => {
-    console.log('OTP sent successfully:', data);
+  const handleOtpSuccess = (data) => {    console.log('OTP sent successfully:', data);
     setOtpSent(true);
-    // Redirect to verify page
     router.push('/auth/verify-otp');
   };
-  
-  const handleOtpError = (error) => {
+    const handleOtpError = (error) => {
     console.error('OTP send failed:', error);
-    // Handle error (show toast, etc.)
   };
   
   return (
@@ -39,7 +29,7 @@ export default function SendOtpPage() {
   );
 }
 
-// pages/auth/verify-otp.js
+
 import { VerifyOtp } from '../../../client/src/components/VerifyOtp';
 import { useRouter } from 'next/router';
 
@@ -48,7 +38,7 @@ export default function VerifyOtpPage() {
   
   const handleVerifySuccess = (data) => {
     console.log('OTP verified:', data);
-    // Store auth token, redirect to dashboard
+    
     localStorage.setItem('authenticated', 'true');
     router.push('/dashboard');
   };
@@ -70,14 +60,14 @@ export default function VerifyOtpPage() {
   );
 }
 
-// next.config.js
+
 module.exports = {
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3300',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
   }
 };
 
-// .env.local
-// NEXT_PUBLIC_API_URL=http://localhost:3300
-// or for production:
-// NEXT_PUBLIC_API_URL=https://your-api-domain.com
+
+
+
+

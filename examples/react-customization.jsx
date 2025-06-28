@@ -1,12 +1,8 @@
-/**
- * @fileoverview React Component Customization Examples
- * Shows various ways to customize and use the OTP components
- */
 
 import React, { useState } from 'react';
 import { SendOtp, VerifyOtp } from '../client/src/components';
 
-// Example 1: Basic usage with custom styling
+
 export function BasicOtpFlow() {
   const [currentStep, setCurrentStep] = useState('send');
   const [email, setEmail] = useState('');
@@ -36,7 +32,7 @@ export function BasicOtpFlow() {
           email={email}
           onSuccess={(data) => {
             console.log('Verification successful:', data);
-            // Handle successful verification
+            
           }}
           onError={(error) => {
             console.error('Verification failed:', error);
@@ -49,7 +45,7 @@ export function BasicOtpFlow() {
   );
 }
 
-// Example 2: Custom UI with progress indicator
+
 export function CustomOtpFlow() {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
@@ -59,7 +55,7 @@ export function CustomOtpFlow() {
   
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
-      {/* Progress Indicator */}
+      {}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           {steps.map((stepName, index) => (
@@ -91,7 +87,7 @@ export function CustomOtpFlow() {
         </p>
       </div>
       
-      {/* Step Content */}
+      {}
       {step === 1 && (
         <div>
           <h2 className="text-xl font-bold mb-4 text-center">Enter Your Email</h2>
@@ -129,9 +125,9 @@ export function CustomOtpFlow() {
             showResend={true}
             resendCooldown={30}
             onResend={() => {
-              // Resend OTP logic
+              
               setLoading(true);
-              // Call send OTP API again
+              
               setLoading(false);
             }}
           />
@@ -155,7 +151,7 @@ export function CustomOtpFlow() {
           </p>
           <button
             onClick={() => {
-              // Redirect to main app
+              
               window.location.href = '/dashboard';
             }}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
@@ -168,7 +164,7 @@ export function CustomOtpFlow() {
   );
 }
 
-// Example 3: Modal-based OTP flow
+
 export function ModalOtpFlow({ isOpen, onClose, onComplete }) {
   const [step, setStep] = useState('send');
   const [email, setEmail] = useState('');
@@ -216,9 +212,9 @@ export function ModalOtpFlow({ isOpen, onClose, onComplete }) {
   );
 }
 
-// Example 4: Multi-purpose OTP component
+
 export function FlexibleOtpForm({ 
-  purpose = 'login', // 'login', 'registration', 'password-reset', '2fa'
+  purpose = 'login', 
   onComplete,
   config = {}
 }) {
